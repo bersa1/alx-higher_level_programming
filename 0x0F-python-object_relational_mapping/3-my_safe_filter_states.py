@@ -1,15 +1,23 @@
 #!/usr/bin/python3
-"""SQL injection"""
-from sys import argv
-import MySQLdb
+"""Script takes in arguments, sanitizes them, and display state
+Takes four arguments:
+    mysql username
+    mysql password
+    database name
+    name to match (to sanitize)
+Connects to default host (localhost) and port (3306)
+"""
 
-
-if __name__ == '__main__':
-    user, password, database, state = argv[1], argv[2], argv[3], argv[4]
-    db = MySQLdb.connect(host="localhost",
-                         user=user, passwd=password, db=database)
-    db = db.cursor()
-    db.execute("""SELECT * FROM states WHERE name=%s ORDER BY id""", (state,))
-    r = db.fetchall()
-    for i in r:
-        print(i)
+if __name__ == "__main__":
+    from sys import argv
+    import MySQLdb
+    db = MySQLdb.connect(user=argv[1], passwd=argv[2], db=argv[3])
+    c = db.cursor()
+    param = (argv[4], )
+    c.execute("SELECT * FROM states WHERE name = %s\
+            ORDER BY states.id ASC", param)
+    rows = c.fetchall()
+    for row in rows:
+        print(row)
+    c.close()
+    db.close()

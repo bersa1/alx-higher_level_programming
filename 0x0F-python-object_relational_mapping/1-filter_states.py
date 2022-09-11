@@ -1,18 +1,22 @@
 #!/usr/bin/python3
-"""script that lists all states with a name starting with N
-(upper N) from the database hbtn_0e_0_usa
+"""Script lists all states with a name starting with N from database
+Takes three arguments:
+    mysql username
+    mysql password
+    database name
+Connects to default host (localhost) and port (3306)
 """
-from sys import argv
-import MySQLdb
 
-
-if __name__ == '__main__':
-    user, password, database = argv[1], argv[2], argv[3]
-    db = MySQLdb.connect(host="localhost", user=user,
-                         passwd=password, db=database)
-    db = db.cursor()
-    db.execute("""SELECT * FROM states
-    WHERE REGEXP_LIKE(name, '^N', 'c') ORDER BY id""")
-    r = db.fetchall()
-    for i in r:
-        print(i)
+if __name__ == "__main__":
+    from sys import argv
+    import MySQLdb
+    db = MySQLdb.connect(user=argv[1], passwd=argv[2], db=argv[3])
+    c = db.cursor()
+    c.execute("""SELECT * FROM states WHERE name like "N%"\
+            ORDER BY states.id ASC""")
+    rows = c.fetchall()
+    for row in rows:
+        if row[1][0] == 'N':
+            print(row)
+    c.close()
+    db.close()

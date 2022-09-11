@@ -1,19 +1,24 @@
 #!/usr/bin/python3
-"""script that lists all State objects from the database hbtn_0e_6_usa
+"""Script prints all City objects
+Takes three arguments
+    mysql username
+    mysql password
+    database name
+Connects to host localhost and default port (3306)
 """
-import sys
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-from model_city import City
-from model_state import Base, State
-
-
 if __name__ == "__main__":
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
-                           .format(sys.argv[1], sys.argv[2], sys.argv[3]),
-                           pool_pre_ping=True)
+    from sqlalchemy import (create_engine)
+    from sqlalchemy.orm import aliased, sessionmaker
+    from model_state import Base, State
+    from model_city import City
+    from sys import argv
+    Session = sessionmaker()
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
+        argv[1], argv[2], argv[3]), pool_pre_ping=True)
+    session = Session(bind=engine)
     Base.metadata.create_all(engine)
-    session = Session(engine)
-    s = session.query(City, State)
-    print(s)
+    result = (session.query(State.name, City.id, City.name).filter(
+        State.id == City.state_id).order_by(City.id).all())
+    for i in result:
+        print("{}: ({:d}) {}".format(i[0], i[1], i[2]))
     session.close()
