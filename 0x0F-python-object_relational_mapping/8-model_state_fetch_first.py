@@ -1,24 +1,23 @@
 #!/usr/bin/python3
-"""Script prints first `State` object from database
-Takes three arguments
-    mysql username
-    mysql password
-    database name
-Connects to host localhost and default port (3306)
 """
-if __name__ == "__main__":
-    from sqlalchemy import (create_engine)
-    from sqlalchemy.orm import sessionmaker
+Prints the first State object from the database hbtn_0e_6_usa
+"""
+if __name__ == '__main__':
     from model_state import Base, State
-    from sys import argv
-    Session = sessionmaker()
-    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'.format(
-        argv[1], argv[2], argv[3]), pool_pre_ping=True)
-    session = Session(bind=engine)
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    import sys
+
+    engine = create_engine('mysql+mysqldb://{}:{}@localhost/{}'
+                           .format(sys.argv[1], sys.argv[2], sys.argv[3]),
+                           pool_pre_ping=True)
     Base.metadata.create_all(engine)
-    instance = session.query(State).first()
-    if instance:
-        print("{}: {}".format(instance.id, instance.name))
-    else:
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    data = session.query(State).first()
+    if data is None:
         print("Nothing")
+    else:
+        print('{}: {}'.format(data.id, data.name))
     session.close()
